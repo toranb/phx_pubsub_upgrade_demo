@@ -1,20 +1,21 @@
-# Subpub
+Start the Phoenix server `iex -S mix phx.server`
 
-To start your Phoenix server:
+Visit localhost:4000 in the browser
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.setup`
-  * Install Node.js dependencies with `npm install` inside the `assets` directory
-  * Start Phoenix endpoint with `mix phx.server`
+From iex, query to see what user sessions are connected
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+`iex(3)> Registry.lookup(Subpub.Tracker.Registry, "user_sockets")`
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+This should return a list of pids and session ids like so
 
-## Learn more
+`[{#PID<0.577.0>, "d3d7a8cb-c1f9-41c7-b16e-1b3b39417eb5"}]`
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+Notice that if you navigate away from the app the connection is removed
+
+`iex(4)> Registry.lookup(Subpub.Tracker.Registry, "user_sockets")`
+
+`[]`
+
+The purpose of this exercise is to offer a solution that returns active user socket connections
+
+I used this to migrate away from `Phoenix.PubSub.Local.list` during a phx 1.4 => 1.5 upgrade
