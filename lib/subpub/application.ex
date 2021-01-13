@@ -14,7 +14,8 @@ defmodule Subpub.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Subpub.PubSub},
       # Start the Endpoint (http/https)
-      SubpubWeb.Endpoint
+      SubpubWeb.Endpoint,
+      {Subpub.Tracker.Supervisor, []}
       # Start a worker by calling: Subpub.Worker.start_link(arg)
       # {Subpub.Worker, arg}
     ]

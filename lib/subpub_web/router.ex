@@ -1,12 +1,39 @@
 defmodule SubpubWeb.Router do
   use SubpubWeb, :router
 
+  def validate_session(conn, _opts) do
+    case get_session(conn, :session_uuid) do
+      nil ->
+        conn |> put_session(:session_uuid, Ecto.UUID.generate())
+
+      _ ->
+        conn
+    end
+  end
+
+  def require_session(conn, _opts) do
+    case get_session(conn, :session_uuid) do
+      nil ->
+        conn |> halt()
+
+      _ ->
+        user_id = 1
+        assign(conn, :current_user, %{id: user_id})
+    end
+  end
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :validate_session
+  end
+
+  pipeline :restricted do
+    plug :browser
+    plug :require_session
   end
 
   pipeline :api do
@@ -14,7 +41,7 @@ defmodule SubpubWeb.Router do
   end
 
   scope "/", SubpubWeb do
-    pipe_through :browser
+    pipe_through :restricted
 
     get "/", PageController, :index
   end
